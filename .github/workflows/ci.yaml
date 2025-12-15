@@ -1,0 +1,30 @@
+name: Haskell Tests
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  run-all:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v6
+    
+    - name: Install Nix
+      uses: cachix/install-nix-action@v31
+    
+    - name: Enable flakes
+      run: |
+        mkdir -p ~/.config/nix
+        echo "experimental-features = nix-command flakes" >> ~/.config/nix/nix.conf
+    
+    - name: Build Stack dependencies
+      run: |
+        nix develop --command stack build --test
+
+    - name: Run tests
+      run: |        
+        nix develop --command stack test
+
